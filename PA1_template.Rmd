@@ -12,6 +12,7 @@ This is a markdown document to provide answers to the Peer Assignment for the co
 ## Loading and preprocessing the data
 We will first load and preprocess the data from the .csv file. We use the lubridate package to transform the dates to a more usable format
 
+
 ```{r load_data}
 data <- read.csv("activity.csv")
 library(lubridate)
@@ -54,7 +55,7 @@ First calculate how many missing values are in the current dataset
 Then we use a for loop to set the NAs with a new value (the mean of the steps on the given interval)
 
 
-```{r missing values, cache=TRUE}
+```{r missing values}
 sum(is.na(data))
 newdata <- data
 
@@ -73,7 +74,13 @@ for(i in 1:length(newdata[,1])) {
 sum(is.na(newdata))
 
 totalstepsnew <- tapply(newdata$steps, newdata$date, sum)
+```
+
+```{r histogram}
 hist(totalstepsnew, xlab="Total steps per day", main="Histogram of Total steps per day")
+```
+
+```{r mean and median}
 mean(totalstepsnew)
 median(totalstepsnew)
 
