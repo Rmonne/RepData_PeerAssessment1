@@ -1,25 +1,86 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: "Robert Monné"
+date: "7 december 2014"
 output: 
   html_document:
     keep_md: true
 ---
 
+This is a markdown document to provide answers to the Peer Assignment for the course Reproducible research in the data science specialisation
 
 ## Loading and preprocessing the data
+We will first load and preprocess the data from the .csv file. We use the lubridate package to transform the dates to a more usable format
 
-
+```{r load_data}
+data <- read.csv("activity.csv")
+library(lubridate)
+data$date <- ymd(data$date)
+```
 
 ## What is mean total number of steps taken per day?
+Make a histogram of the total number of steps taken each day  
+And compute the mean and median of the total number of steps taken each day  
 
+```{r explore_data}
+totalsteps <- tapply(data$steps, data$date, sum)
+hist(totalsteps, xlab="Total steps per day", main="Histogram of Total steps per day")
+mean(totalsteps)
+median(totalsteps)
+
+```
 
 
 ## What is the average daily activity pattern?
+Calculate the average of steps per time interval  
+Plot the intervals on the X-axis and the Average amount of steps on the Y-axis  
+In what interval lies the maximum of average steps?  
+
+```{r average}
+averagesteps <- as.data.frame(tapply(data$steps, data$interval, mean, na.rm=T))
+
+plot(rownames(averagesteps), averagesteps[,1], type = "l", xlab="Interval", ylab="Average Steps")
+
+names(which.max(averagesteps[,1]))
+
+```
+
 
 
 
 ## Imputing missing values
+First calculate how many missing values are in the current dataset
+
+Then we use a for loop to set the NAs with a new value (the mean of the steps on the given interval)
 
 
+```{r missing values, cache=TRUE}
+sum(is.na(data))
+newdata <- data
+
+#for every row in the dataset
+for(i in 1:length(newdata[,1])) {
+  #check if there is a NA
+  if(is.na(newdata[i,1])) {
+    #grab the associated interval of the NA
+    interval <- newdata[i,3]
+    #use the found interval to grab the mean steps of that interval and set is as new value for the NA
+    #we grab the first value resulting vector due to overlappings like: 815 & 1815
+    newdata[i,1] <- averagesteps[grep(as.character(interval), rownames(averagesteps)),1][1]
+  }
+}
+
+sum(is.na(newdata))
+
+totalstepsnew <- tapply(newdata$steps, newdata$date, sum)
+hist(totalstepsnew, xlab="Total steps per day", main="Histogram of Total steps per day")
+mean(totalstepsnew)
+median(totalstepsnew)
+
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+
